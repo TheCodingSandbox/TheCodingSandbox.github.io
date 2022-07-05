@@ -21,3 +21,11 @@ h3 {
             border-color: white;
             border-width: thick;
 }
+.linkbtn{
+	color:white;
+	background-color: black;
+	border-style: solid;
+	border-color: white;
+	border-width: thin;
+	border-radius: 10px;
+}
