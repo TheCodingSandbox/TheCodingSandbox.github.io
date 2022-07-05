@@ -58,6 +58,8 @@
 		.inputbox {
 			 position: absolute;
 			 transform: translate(-50%, -50%);
+			left: 50%;
+            		top: 50%;
 		}
 	</style>
   <body>
@@ -73,7 +75,6 @@
 			<a href="">Settings</a>
 			<a href="https://thecodingsandbox.github.io/">Home</a>
 		</div>
-		<div class = "htmlbox">
 	  <div style="height: 200px;" class = "inputbox">
 <textarea placeholder="Enter HTML Source Code" id="editing" spellcheck="false" oninput="update(this.value); sync_scroll(this);" onscroll="sync_scroll(this);" onkeydown="check_tab(this, event);"></textarea>
 <pre id="highlighting" aria-hidden="true">
@@ -81,7 +82,6 @@
 
 </code>
 </pre>
-	  </div>
 	  </div>
 	  
   </body>
