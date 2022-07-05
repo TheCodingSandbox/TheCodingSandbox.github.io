@@ -67,42 +67,15 @@
 			<a href="">Settings</a>
 			<a href="https://thecodingsandbox.github.io/">Home</a>
 		</div>
-		<div class = "htmlbox">
-			<section class="try">
-    <div class="container">
-    <h2>HTML Editor</h2>
-        <div class="editor row">
-            <div class="span3">                 
-                <p>Colorizers are implemented using <a href="monarch.html"
-                    target="_blank">Monarch Editor</a>.</p>
-            </div>
-            <div class="span9">
-                <div class="row">
-                    <div class="span4">
-                        <label class="control-label">Language (This will run in a HTML enviorment)</label>
-                        <select class="language-picker"></select>
-                    </div>
-                    <div class="span4">
-                        <label class="control-label">Theme</label>
-                        <select class="theme-picker">
-                            <option>Visual Studio Dark</option>
-                            <option>High Contrast Dark</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="editor-frame">
-                    <div class="loading editor" style="display: none;">
-                        <div class="progress progress-striped active">
-                            <div class="bar"></div>
-                        </div>
-                    </div>
-                    <div id="editor"></div>
-                </div>
-            </div>
-        </div>   
-   </div>
-</section>
-		</div>
-	  <script src = "/Assets/javascript/scripteditor.js"></script>
+		
+	  <div style="height: 200px;">
+<textarea placeholder="Enter HTML Source Code" id="editing" spellcheck="false" oninput="update(this.value); sync_scroll(this);" onscroll="sync_scroll(this);" onkeydown="check_tab(this, event);"></textarea>
+<pre id="highlighting" aria-hidden="true">
+<code class="language-html" id="highlighting-content">
+
+</code>
+</pre>
+	  </div>
+	  <script src = ""></script>
   </body>
 </html>
