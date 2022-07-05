@@ -1,4 +1,5 @@
 'use strict';
+let require
 require.config({
     baseUrl: 'https://microsoft.github.io/monaco-editor/node_modules/monaco-editor/min/'
 });
