@@ -7,7 +7,7 @@ h3 {
   color: grey
 }
 .card{
-            background-color: grey;
+            background-color: black;
             position: absolute;
             left: 50%;
             top: 50%;
@@ -17,4 +17,5 @@ h3 {
             font-family: sans-serif;
             text-align: center;
             border-radius: 5px;
+            border-color: white;
 }
