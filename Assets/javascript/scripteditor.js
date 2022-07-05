@@ -1,176 +1,35 @@
-'use strict';
-let require
-require.config({
-    baseUrl: 'https://microsoft.github.io/monaco-editor/node_modules/monaco-editor/min/'
-});
-
-
-var editor = null,
-    diffEditor = null;
-
-$(document).ready(function() {
-    require(['vs/editor/editor.main'], function() {
-        var MODES = (function() {
-            var modesIds = monaco.languages.getLanguages().map(function(lang) {
-                return lang.id;
-            });
-            modesIds.sort();
-
-            return modesIds.map(function(modeId) {
-                return {
-                    modeId: modeId,
-                    sampleURL: 'https://microsoft.github.io/monaco-editor/index/samples/sample.' + modeId + '.txt'
-                };
-            });
-        })();
-
-        for (var i = 0; i < MODES.length; i++) {
-            var o = document.createElement('option');
-            o.textContent = MODES[i].modeId;
-            $(".language-picker").append(o);
-        }
-        $(".language-picker").change(function() {
-            loadSample(MODES[this.selectedIndex]);
-        });
-        $('.language-picker').selectpicker({
-            size: 10
-        });
-        loadSample(MODES[0]);
-
-        $(".theme-picker").change(function() {
-            changeTheme(this.selectedIndex);
-        });
-        $('.theme-picker').selectpicker({
-            size: 3
-        });
-
-        loadDiffSample();
-
-        $('#inline-diff-checkbox').change(function() {
-            diffEditor.updateOptions({
-                renderSideBySide: !$(this).is(':checked')
-            });
-        });
-    });
-
-    window.onresize = function() {
-        if (editor) {
-            editor.layout();
-        }
-        if (diffEditor) {
-            diffEditor.layout();
-        }
-    };
-});
-
-function loadSample(mode) {
-    $.ajax({
-        type: 'GET',
-        url: mode.sampleURL,
-        dataType: 'text',
-        beforeSend: function() {
-            $('.loading.editor').show();
-        },
-        error: function() {
-            if (editor) {
-                if (editor.getModel()) {
-                    editor.getModel().dispose();
-                }
-                editor.dispose();
-                editor = null;
-            }
-            $('.loading.editor').fadeOut({
-                duration: 200
-            });
-            $('#editor').empty();
-            $('#editor').append('<p class="alert alert-error">Failed to load ' + mode.modeId + ' sample</p>');
-        }
-    }).done(function(data) {
-        if (!editor) {
-            $('#editor').empty();
-            editor = monaco.editor.create(document.getElementById('editor'), {
-                model: null,
-            });
-        }
-
-        var oldModel = editor.getModel();
-        var newModel = monaco.editor.createModel(data, mode.modeId);
-        editor.setModel(newModel);
-        if (oldModel) {
-            oldModel.dispose();
-        }
-        $('.loading.editor').fadeOut({
-            duration: 300
-        });
-    });
+function update(text) {
+  let result_element = document.querySelector("#highlighting-content");
+  // Handle final newlines (see article)
+  if(text[text.length-1] == "\n") {
+    text += " ";
+  }
+  // Update code
+  result_element.innerHTML = text.replace(new RegExp("&", "g"), "&amp;").replace(new RegExp("<", "g"), "&lt;"); /* Global RegExp */
+  // Syntax Highlight
+  Prism.highlightElement(result_element);
 }
 
-function loadDiffSample() {
-
-    var onError = function() {
-        $('.loading.diff-editor').fadeOut({
-            duration: 200
-        });
-        $('#diff-editor').append('<p class="alert alert-error">Failed to load diff editor sample</p>');
-    };
-
-    $('.loading.diff-editor').show();
-
-    var lhsData = null,
-        rhsData = null,
-        jsMode = null;
-
-    $.ajax({
-        type: 'GET',
-        url: 'https://microsoft.github.io/monaco-editor/index/samples/diff.lhs.txt',
-        dataType: 'text',
-        error: onError
-    }).done(function(data) {
-        lhsData = data;
-        onProgress();
-    });
-
-    $.ajax({
-        type: 'GET',
-        url: 'https://microsoft.github.io/monaco-editor/index/samples/diff.rhs.txt',
-        dataType: 'text',
-        error: onError
-    }).done(function(data) {
-        rhsData = data;
-        onProgress();
-    });
-
-    function onProgress() {
-        if (lhsData && rhsData) {
-            diffEditor = monaco.editor.createDiffEditor(document.getElementById('diff-editor'), {
-                enableSplitViewResizing: false
-            });
-
-            var lhsModel = monaco.editor.createModel(lhsData, 'text/javascript');
-            var rhsModel = monaco.editor.createModel(rhsData, 'text/javascript');
-
-            diffEditor.setModel({
-                original: lhsModel,
-                modified: rhsModel
-            });
-
-            $('.loading.diff-editor').fadeOut({
-                duration: 300
-            });
-        }
-    }
+function sync_scroll(element) {
+  /* Scroll result to scroll coords of event - sync with textarea */
+  let result_element = document.querySelector("#highlighting");
+  // Get and set x and y
+  result_element.scrollTop = element.scrollTop;
+  result_element.scrollLeft = element.scrollLeft;
 }
 
-function changeTheme(theme) {
-    var newTheme = (theme === 1 ? 'vs-dark' : (theme === 0 ? 'vs' : 'hc-black'));
-    if (editor) {
-        editor.updateOptions({
-            'theme': newTheme
-        });
-    }
-    if (diffEditor) {
-        diffEditor.updateOptions({
-            'theme': newTheme
-        });
-    }
+function check_tab(element, event) {
+  let code = element.value;
+  if(event.key == "Tab") {
+    /* Tab key pressed */
+    event.preventDefault(); // stop normal
+    let before_tab = code.slice(0, element.selectionStart); // text before tab
+    let after_tab = code.slice(element.selectionEnd, element.value.length); // text after tab
+    let cursor_pos = element.selectionStart + 1; // where cursor moves after tab - moving forward by 1 char to after tab
+    element.value = before_tab + "\t" + after_tab; // add tab char
+    // move cursor
+    element.selectionStart = cursor_pos;
+    element.selectionEnd = cursor_pos;
+    update(element.value); // Update text to include indent
+  }
 }
